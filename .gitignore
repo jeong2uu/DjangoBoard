@@ -3,6 +3,7 @@
 manage.py
 db.sqlite3
 __init__.py
+config/settings.py
 
 #폴더
 migrations
