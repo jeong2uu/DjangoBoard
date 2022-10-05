@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% load static %}
+{% block body %}
+    {% include "navbar.html" %}
+      <section id = "main">
+          <!-- ======= Breadcrumbs ======= -->
+      <section id="breadcrumbs" class="breadcrumbs">
+          <div class="container">
+
+            <div class="d-flex justify-content-between align-items-center">
+              <h4>게시판</h4>
+              <ol>
+                <li><a href="/">Home</a></li>
+                <li>게시판</li>
+              </ol>
+            </div>
+          </div>
+        </section><!-- End Breadcrumbs -->
+
+        <!-- ======= Services Section ======= -->
+      <section id="services" class="services">
+          <div class="container">
+            <div class="section-title" data-aos="fade-up">
+                <h3>게시판 목록</h3>
+                <div style="margin:20px 0;text-align:right;">
+                  <button id="modalBtn" class="btn btn-outline-success my-2 my-sm-0" style="margin-right:10px;" >글쓰기</button>
+                  <button id="deletetBtn" class="btn btn-outline-success my-2 my-sm-0" style="margin-right:10px;" >삭제</button>
+                </div>
+
+                {% if bool %}
+                    <p class="text-center">내용이 없습니다! </p>
+                {% endif %}
+                
+                    <div style="margin:20px 0;">
+                      <table id="extable" class="table table-striped table-bordered" border="0" cellpadding="0" cellspacing="0" width="100%">
+                        
+                      </table>
+                </div>
+            </div>
+          </div>
+          
+      </section><!-- End Services Section -->
+      {% include "footer.html" %}
+      {% block scripts %}
+      <script type="text/javascript" charset="utf-8">
+        $('document').ready(function(){
+          
+          var datas = {{ test |safe }};
+          console.log(datas);
+          
+          //datetable의 변경사항을 반용하도록 디스플레이 업데이트 하기위한 기능 : draw()
+          var mytable = $('#extable').DataTable({
+            bAutoWidth: false,       // 가로 자동
+            processing: true,       // 서버와 통신 시, 응답을 받기 전이라는 ui를 띄울 것인지 여부
+            lengthChange: false,   // 길이 변동
+            searching: false,     // search기능 
+            destroy: true,        // 테이블 재생성
+            responsive:true,      // 반응형 설정
+            paging: true, //페이징처리
+            pageLength: 5,       // 기본데이터 건수
+            // ordering: true, // 칼럼별 정렬기능
+            data : datas,
+            order: [[ 2, 'desc' ]],    // 날짜기준(target:2) 오름차순'asc',내림차순'desc'
+            columns: [
+                {},
+                {"title" : "번 호", "data": "bid"},
+                {"title" : "제 목", "data": "title"},
+                {"title" : "날 짜", "data": "datetime"}, 
+                {"title" : "작성자", "data": "writer"},
+              ],  
+              columnDefs: [
+                  { 
+                    title : '<input type="checkbox" id="allClick" />',
+                    width : "5%", 
+                    orderable: false,
+                    className: "select-checkbox",
+                    targets: 0,
+                    data : null,
+                    defaultContent: ''
+                  }, //targets[4]
+                  {targets: 1,
+                    width : "10%",               
+                  },
+                  {targets: 2,
+                    width : "45%",                    
+                  },
+                  {targets: 3,
+                    width : "20%",                    
+                  },
+                  {targets: 4,
+                    width : "20%",                    
+                  }
+                  
+                ],
+              select: {
+                  style: 'multi',
+                  selector: 'td:first-child'
+              },//inColmplete 초기화 함수
+              initComplete: function(settings, json) {
+                $("#allClick").prop("checked",false);
+                $("#allClick").click(function(){
+                  if($(this).prop("checked")){
+                      mytable.rows().select();
+                  }
+                  else {
+                      mytable.rows().deselect();
+                  }
+                });
+              }
+            });
+            mytable.on('order.dt', function () {
+              mytable.column(1, {order:'applied'}).nodes().each( function (cell, i) {
+                    cell.innerHTML = i+1;
+                } );
+            } ).draw();
+
+          //글 쓰기
+          $('#modalBtn').click(function(e){
+            $.ajax({
+              url:'/board/boardWrite',
+              dataType: 'html',
+              async: false,
+              success : function(result){
+                alert("success!");
+                $('#services').html(result) // 그 이후에 example div에 list html의 data를 가져온다.
+              },error : function(xhr,errmsg,err){ //실패 
+                alert("에러: "+ xhr.status + ": " + xhr.responseText); 
+              } 
+            });
+          });
+
+          //글 상세보기
+          $('#extable tbody').on("click", "td", function(e){
+            var idx = mytable.column(this).index();
+            // console.log(idx);
+            // var data = mytable.row( $(this).parents('th') ).data();
+            // console.log(data);
+            if (idx=='2'){
+            var rowdataId = mytable.row(this).data().bid ;
+              // console.log(this);           // <td>aaa</td>
+              //  console.log(this);          // undefined
+              //  mytable.rows(this).data(); //[object Object]
+            var rowdata = $(this).text();
+            console.log("title : " + rowdata + ", id :" + rowdataId );
+            var data = { "title" : rowdata , "bid" : rowdataId }
+            
+            $.ajax({
+              url:'/board/boardDetail',
+              type: 'POST',
+              data: JSON.stringify(data),
+              async: false,
+              dataType: 'html',
+                success : function(result){
+                  alert("success!");
+                  $('#services').html(result)
+                },error : function(xhr,errmsg,err){ //실패 
+                  alert("에러: "+ xhr.status + ": " + xhr.responseText); 
+                } 
+              });
+             } 
+            });
+            
+            //글 수정 - newboardDetail.html
+            
+            //글 삭제
+          $('#deletetBtn').click(function(e){
+              var checkList = [];
+              var checknum = 0;
+              mytable.rows(".selected").data().each(function(p) {
+                var checkdata = p.bid;
+                console.log(checkdata)
+                checkList.push(checkdata);
+                console.log(checkList);
+                checknum++;
+              });
+              var postData = { "checkNum": checknum, "checkList": checkList };
+              $.ajax({
+                    url: '/board/deleteData',
+                    type: 'POST',
+                    //timeout: 1000,      //응답대기시간 옵션
+                    async: false,
+                    data: JSON.stringify(postData),
+                    traditional: true,        //배열넘기기 옵션
+                    success : function(result){
+                    alert("success : " +  result);
+                  },error : function(xhr,errmsg,err){ //실패 
+                    alert("에러: "+ xhr.status + ": " + xhr.responseText); 
+                  } 
+              });
+          });
+		  
+        });
+        
+        </script>
+      </section><!-- End #main -->
+      {% endblock %}<!--script end-->
+    
+  {% endblock %}        

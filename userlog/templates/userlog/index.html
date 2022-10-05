@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+  {% block body %}
+  <link href="/static/assets/css/signin.css" rel="stylesheet">
+    <section id="main" class="form-signin">
+      <form method="POST">
+        <img class="mb-4" src="/static/assets/img/favicon.png" alt="" width="72" height="57">
+        <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+
+        {% csrf_token %}
+        <div class="form-floating">
+          <input class="form-control" id="userid" name="userid" placeholder="ID">
+          <label for="floatingInput">ID</label>
+        </div>
+        <div class="form-floating">
+          <input type="password" class="form-control" id="userpw" name="userpw" placeholder="Password">
+          <label for="floatingPassword">Password</label>
+        </div>
+
+        <div class="checkbox mb-3">
+          <label>
+            <input type="checkbox" value="remember-me"> Remember me
+          </label>
+        </div>
+      
+        <button id="logBtn"class="w-100 btn btn-lg btn-primary" type="submit"></a>Sign in</button>
+      </form>
+
+      <button id="addBtn" class="w-100 btn btn-lg btn-primary" type="submit">Join</button>
+      <p class="mt-5 mb-3 text-muted">&copy; 2017–2021</p>
+      
+
+      <div class="hide">
+        {% include "footer.html" %}
+      </div>
+    </section>
+
+    {% block scripts %} 
+    <script type="text/javascript" charset="utf-8">
+    $(function(){   
+        $('.hide').hide();
+        
+        //loginbtn
+        $('#logBtn').click(function(e){
+          $.ajax({
+            url:'/userlog/',
+            dataType: 'html',
+            async: false,
+            success : function(result){
+              alert("login success!");
+            },error : function(xhr,errmsg,err){ //실패 
+              alert("에러: "+ xhr.status + ": " + xhr.responseText); 
+            } 
+          });
+        });
+
+        //signup
+        $('#addBtn').click(function(e){
+              $.ajax({
+                url:'/userlog/signup',
+                dataType: 'html',
+                async: false,
+                success : function(result){
+                  alert("success!");
+                  $(location).attr('href','signup');
+                },error : function(xhr,errmsg,err){ //실패 
+                  alert("에러: "+ xhr.status + ": " + xhr.responseText); 
+                } 
+              });
+          });
+      });
+    </script>
+    {% endblock %} <!-- end scripts -->
+
+  {% endblock %}
+    

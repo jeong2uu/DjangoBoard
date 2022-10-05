@@ -1,0 +1,62 @@
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <thead>
+    {% for i in content %}
+    <tr style="height:45px;border-top:solid 1px #dddddd;">
+      <td width="20%" align="center">제 목</td>
+      <td width="80%" align="left"><input type="text" placeholder="{{i.title}}" id="b_title" name="b_title" class="form-control" style="width:80%;"></td>
+    </tr>
+    <tr style="height:45px;border-top:solid 1px #dddddd;">
+        <td width="20%" align="center">작성자</td>
+        <td width="80%" align="left"><input type="text" placeholder="{{i.writer}}" id="b_writer" name="b_writer" class="form-control"></td>
+    </tr>
+    <tr style="height:45px;border-top:solid 1px #dddddd;" class="hidden">
+        <td width="20%" align="center">날 짜</td>
+        <td width="80%" align="left" id="datetime" value="{{bid}}">{{ i.datetime }}</td>
+    </tr>
+    <tr style="height:45px;border-top:solid 1px #dddddd;">
+        <td width="20%" align="center">내용</td>
+        <td width="80%" align="left"><textarea id="b_note" placeholder="{{i.note}}" class="form-control" name="b_note" style="width:80%;" rows="5"></textarea></td>
+    </tr>
+    {% endfor %}
+  </thead>
+  <tfoot>
+    <tr style="height:45px;border-top:solid 1px #dddddd;" align="center">
+        <td width="100%" colspan="2">
+            <button id="modalU" style="margin-right:10px;" >등록</button>
+            <button id="modalX" style="margin-right:10px;" >목록</button>
+        </td>
+    </tr>
+  </tfoot>
+</table>
+<script type="text/javascript">
+  $(function(){ 
+      $('#modalU').click(function(e){
+        var dataArray = [];
+        var bidval = $("#datetime").attr('value');
+        var title = $("#b_title").val();
+        var writer = $("#b_writer").val();
+        var note = $("#b_note").val();
+
+        var data1 = { 'bid' : bidval }
+        var data2 = { 'title': title, 'writer': writer, 'note': note }
+
+        dataArray.push(data1);
+        dataArray.push(data2);
+
+        var paramList = {
+          "paramList" : dataArray
+        }
+        $.ajax({
+            url:'/board/updateData',
+            type: 'POST',
+            async: false,
+            data: JSON.stringify(paramList),
+            success : function(data){
+                alert("update success !!"); 
+            },error : function(xhr,errmsg,err){ //실패 
+                alert("에러: "+ xhr.status + ": " + xhr.responseText); 
+            } 
+        });
+      });
+
+  });

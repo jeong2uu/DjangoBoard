@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+    {% block body %}     
+        <section id = "main">
+            <!-- 회원가입 확인 Modal-->
+                <div class="modal fade"  id="checkModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false" 
+                style="position:absolute; z-index: 9999;">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content" >
+                            <div class="modal-header">
+                                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">X</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                            {% csrf_token %}
+                            <form id="frmBoard" method="POST">
+                                <label style="text-align: center;" class="form-control">{{username}}</label>
+                                {% if result %}
+                                    <label type="text" name="available">{{ username }} 은 사용가능한 아이디 입니다.</label>
+                                {% else %} 
+                                    <label type="text" name="unavailable">{{ username }} 은 사용불가능한 아이디 입니다.</label>
+                                    {% endif %} 
+                                </form>
+                                <div class="modal-footer">
+                                <button type="button" id="checkbutton">확인</button> <!-- 확인 클릭시 name값 post로 보내기 -->
+                                </div>    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        {% block scripts %}
+        <script type="text/javascript">
+            $(function(){ 
+                $('#checkModal').modal("show");
+            });
+
+        </script>
+        </section><!-- End Services Section -->
+
+    </section><!-- End #main -->
+
+    {% endblock %}<!--script close-->
+{% endblock %}

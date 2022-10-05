@@ -1,0 +1,9 @@
+# 파일
+*.pyc
+manage.py
+db.sqlite3
+__init__.py
+
+#폴더
+migrations
+.vscode/

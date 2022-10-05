@@ -1,0 +1,68 @@
+{% load static %}
+    {% block body %} 
+            <section id = "main">
+                <button id="testBtn" class="btn">모달 테스트</button>
+                <!-- 회원가입 확인 Modal-->
+                  <div class="modal fade" id="testModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                          <div class="modal-content">
+                              <div class="modal-header">
+                                  <h5 class="modal-title" id="exampleModalLabel">모달테스트</h5>
+                                  <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">X</span>
+                                  </button>
+                              </div>
+                              <div class="modal-body">
+                                <form id="frmBoard">
+                                    <thead>
+                                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                        <tr style="height:45px;border-top:solid 1px #dddddd;">
+                                          <td width="20%" align="center">제목</td>
+                                          <td width="80%" align="left"><input type="input" placeholder="제 목" name="b_title" style="width:80%;"></td>
+                                        </tr>
+                                        <tr style="height:45px;border-top:solid 1px #dddddd;">
+                                            <td width="20%" align="center">작성자</td>
+                                            <td width="80%" align="left"><input type="input" placeholder="작성자" name="b_writer"></td>
+                                        </tr>
+                                        <tr style="height:45px;border-top:solid 1px #dddddd;">
+                                            <td width="20%" align="center">내용</td>
+                                            <td width="80%" align="left"><textarea name="b_note" style="width:80%;" rows="5"></textarea></td>
+                                        </tr>
+                                      </thead>
+                                      <tfoot>
+                                        <tr style="height:45px;border-top:solid 1px #dddddd;" align="center">
+                                            <td width="100%" colspan="2">
+                                                <button id="modalY" style="margin-right:10px;" onclick="javascript:document.getElementById('frmBoard').submit();">등록</button>
+                                                <button style="margin-right:10px;" onclick="location.href='/aboard'">목록</button>
+                                            </td>
+                                        </tr>
+                                      </tfoot>
+                                    </table>
+                                </form>
+                              </div>
+                              <div class="modal-footer">
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+            {% block scripts %}
+            <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+            
+            <script type="text/javascript">
+                $(function(){ 
+                    $('#testBtn').click(function(e){
+                        e.preventDefault();
+                        $('#testModal').modal("show");
+                    });
+
+                });
+                
+            </script>
+            </section><!-- End Services Section -->
+
+        </section><!-- End #main -->
+
+        {% endblock %}
+ {% endblock %}       

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load static %}
+    {% block body %}     
+        <section id = "main">
+            <!-- 회원가입 확인 Modal-->
+                <div class="modal fade"  id="detailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false" 
+                style="position:absolute; z-index: 9999;">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content" >
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">상세보기</h5>
+                                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">X</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                            <form id="frmBoard">
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <thead>
+                                    {% for i in content %}
+                                    <tr style="height:45px;border-top:solid 1px #dddddd;">
+                                        <td width="20%" align="center">제목</td>
+                                        <td width="80%" align="left" id="title" value="{{bid}}">{{ i.title }}</td>
+                                    </tr>
+                                    <tr style="height:45px;border-top:solid 1px #dddddd;">
+                                        <td width="20%" align="center">작성자</td>
+                                        <td width="80%" align="left">{{ i.writer }}</td>
+                                    </tr>
+                                    <tr style="height:45px;border-top:solid 1px #dddddd;" class="hidden">
+                                        <td width="20%" align="center">날 짜</td>
+                                        <td width="80%" align="left">{{ i.datetime }}</td>
+                                    </tr>
+                                    <tr style="height:45px;border-top:solid 1px #dddddd;">
+                                        <td width="20%" align="center">내용</td>
+                                        <td width="80%" align="left">{{ i.note }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    </thead>
+                                    <tfoot>
+                                    <tr style="height:45px;border-top:solid 1px #dddddd;" align="center">
+                                        <td width="100%" colspan="2">
+                                            <button id="updateBtn" style="margin-right:10px;">수정</button>
+                                            <button id="deleteBtn" style="margin-right:10px;" >삭제</button>
+                                        </td>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                            </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        {% block scripts %}
+        <script type="text/javascript">
+            $(function(){ 
+                $('#detailModal').modal("show");
+
+                //글 수정
+                $('#updateBtn').click(function(e){
+                    $("h5").text("글 수정");
+                    var bidval = $('#title').attr('value');
+                    var data = {'bid': bidval }
+                    $.ajax({
+                    url:'/board/boardUpdate',
+                    type: 'POST',
+                    async:false,
+                    data: JSON.stringify(data),
+                    dataType: 'html',
+                    success : function(result){
+                    alert("success!");
+                    $('#frmBoard').html(result)
+                    },error : function(xhr,errmsg,err){ //실패 
+                    alert("에러: "+ xhr.status + ": " + xhr.responseText); 
+                        } 
+                    });
+                });
+
+                //글 삭제
+                $('#deleteBtn').click(function(e){
+                    var bidval = $('#title').attr('value');
+                    var data = {'bid': bidval }
+                    $.ajax({
+                    url:'/board/deleteData',
+                    type: 'POST',
+                    async:false,
+                    data: JSON.stringify(data),
+                    success : function(result){
+                    alert("success!");
+                    },error : function(xhr,errmsg,err){ //실패 
+                    alert("에러: "+ xhr.status + ": " + xhr.responseText); 
+                        } 
+                    });
+                });
+
+            });
+
+        </script>
+        </section><!-- End Services Section -->
+
+    </section><!-- End #main -->
+
+    {% endblock %}<!--script close-->
+{% endblock %}

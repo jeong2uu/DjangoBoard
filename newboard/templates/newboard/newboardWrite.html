@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load static %}
+    {% block body %} 
+            <section id = "main">
+                <!-- 회원가입 확인 Modal-->
+                  <div class="modal fade"  id="writeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false" 
+                  style="position:absolute; z-index: 9999;">
+                      <div class="modal-dialog" role="document">
+                          <div class="modal-content" >
+                              <div class="modal-header">
+                                  <h5 class="modal-title" id="exampleModalLabel">글작성</h5>
+                                  <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">X</span>
+                                  </button>
+                              </div>
+                              <div class="modal-body">
+                                <form id="frmBoard">
+                                    <thead>
+                                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                        <tr style="height:45px;border-top:solid 1px #dddddd;">
+                                          <td width="20%" align="center">제목</td>
+                                          <td width="80%" align="left"><input type="text" placeholder="제 목" id="b_title" name="b_title" class="form-control" style="width:80%;"></td>
+                                        </tr>
+                                        {% if user.is_authenticated %}
+                                        <tr style="height:45px;border-top:solid 1px #dddddd;">
+                                            <td width="20%" align="center">작성자</td>
+                                            <td width="80%" align="left">{{user}}
+                                            {% else %}
+                                            <input type="text" placeholder="작성자" id="b_writer" name="b_writer" class="form-control"></td>
+                                            {% endif %}
+                                        </tr>
+                                        <tr style="height:45px;border-top:solid 1px #dddddd;" class="hidden">
+                                            <td width="20%" align="center">날 짜</td>
+                                            <td width="80%" align="left">
+                                                <input type="text" id="datePicker" class="form-control">
+                                            </td>
+                                        </tr>
+                                        <tr style="height:45px;border-top:solid 1px #dddddd;">
+                                            <td width="20%" align="center">내용</td>
+                                            <td width="80%" align="left"><textarea id="b_note" class="form-control" name="b_note" style="width:80%;" rows="5"></textarea></td>
+                                        </tr>
+                                      </thead>
+                                      <tfoot>
+                                        <tr style="height:45px;border-top:solid 1px #dddddd;" align="center">
+                                            <td width="100%" colspan="2">
+                                                <button id="modalY" style="margin-right:10px;">등록</button>
+                                                <button id="modalX" style="margin-right:10px;" >목록</button>
+                                            </td>
+                                        </tr>
+                                      </tfoot>
+                                    </table>
+                                </form>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+            {% block scripts %}
+            <!-- 라이브러리 삭제 >> 모달창이 보임 -->
+            <script type="text/javascript">
+                $(function(){ 
+                    $('#writeModal').modal("show");
+                    $("#modalY").click(function() {
+
+                        var title = $("#b_title").val();
+                        var writer = $("#b_writer").val();
+                        var note = $("#b_note").val();
+                        var today = new Date();
+                        var year = today.getFullYear();
+                        var month = ('0' + (today.getMonth() + 1)).slice(-2);
+                        var day = ('0' + today.getDate()).slice(-2);
+
+                        var hours = ('0' + today.getHours()).slice(-2); 
+                        var minutes = ('0' + today.getMinutes()).slice(-2);
+                        var seconds = ('0' + today.getSeconds()).slice(-2); 
+
+                        var datetime = year + '-' + month  + '-' + day + ' ' + hours + ':' + minutes  + ':' + seconds
+
+                        var data = { 'title': title, 'writer': writer, 'datetime' : datetime ,'note': note}
+                        $.ajax({
+                            url:'/board/insertData',
+                            type: 'POST',
+                            async: false,
+                            data: JSON.stringify(data),
+                            success : function(data){
+                                alert("success : "+ data); 
+                            },error : function(xhr,errmsg,err){ //실패 
+                                alert("에러: "+ xhr.status + ": " + xhr.responseText); 
+                            } 
+                        });
+                    });
+                    
+                    $('#modalX').click(function () {
+                            location.href = '/board';
+                        });
+                    $('.close').click(function () {
+                            location.href = '/board';
+                        });
+                    
+                    $(".hidden").hide();
+
+                    $('#datePicker').datepicker({
+                        format: "yyyy-mm-dd",
+                        autoclose : true,	//사용자가 날짜를 클릭하면 자동 캘린더가 닫히는 옵션
+                        calendarWeeks : false, //캘린더 옆에 몇 주차인지 보여주는 옵션 기본값 false 보여주려면 true
+                        clearBtn : false, //날짜 선택한 값 초기화 해주는 버튼 보여주는 옵션 기본값 false 보여주려면 true
+                        disableTouchKeyboard : false,	//모바일에서 플러그인 작동 여부 기본값 false 가 작동 true가 작동 안함.
+                        immediateUpdates: false,	//사용자가 보는 화면으로 바로바로 날짜를 변경할지 여부 기본값 :false 
+                        multidate : false, //여러 날짜 선택할 수 있게 하는 옵션 기본값 :false 
+                        templates : {   //다음달 이전달로 넘어가는 화살표 모양 커스텀 마이징 
+                            leftArrow: '&laquo;',
+                            rightArrow: '&raquo;'
+                        }, 
+                        showWeekDays : true ,// 위에 요일 보여주는 옵션 기본값 : true
+                        todayHighlight : true ,	//오늘 날짜에 하이라이팅 기능 기본값 :false 
+                        toggleActive : true,	//이미 선택된 날짜 선택하면 기본값 : false인경우 그대로 유지 true인 경우 날짜 삭제
+                        weekStart : 0 ,//달력 시작 요일 선택하는 것 기본값은 0인 일요일 
+                        
+                    });
+                });
+
+            </script>
+            </section><!-- End Services Section -->
+
+        </section><!-- End #main -->
+
+        {% endblock %}
+ {% endblock %}       
